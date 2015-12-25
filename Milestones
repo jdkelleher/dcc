@@ -1,10 +1,11 @@
+
 Version 0.1 milestones:
         - server has two database tables
-            - encrypted passwords and metadata
+            - encrypted credentials and metadata
             - client certificates
-        - database is kept in ndbm, because it's extra simple
+        - database is kept extra simple, e.g. ndbm
         - database changes handled outside the server, it detects the file changed by timestamp
-        - passwords are encrypted in the database using a symetric cipher
+        - credentials are encrypted in the database using a symetric cipher
         - the cipher key is held in server's memory
             - in test, the cipher key comes from a config file
             - in production, the cipher key comes from a human.
@@ -13,40 +14,56 @@ Version 0.1 milestones:
             - initially in perl
             - config file, global with cmd line flag
             - client certificate from config file or cmd line flag
-            - returns password on stdout
-        - client runs in userspace, as user
-        - client - server communication is via TLS and https-like protocol
+            - returns credential on stdout
+	    - only needs to support store and retreive
+	    - runs in userspace, as user
+	    - communication is via TLS and https-like protocol
         - clients authenticate using per-user, possibly per-app x509 client certificates
         - certificate management is manual
-        - clients request a password by name
+        - clients request a credential by unique identifier
         - names are arbitrary strings, but recommend a tuple naming scheme
-            ie "hostname.user.application"
-            also recommend avoiding shell metacharacters
+            - e.g. "hostname,user,application" or "ID,Resource"
+	    - tuple should be simple but support collision avoidance for dupe names
+            - recommend avoiding shell metacharacters
         - server always returns something
         - no access controls yet
 
+
 Version 0.2 milestones:
-        - multiple servers, one master, N replicas
-        - changes are propagated from master to replicas manually
-        - Changes must be introduced at the master.
-        - the servers do not share the cipher key between them
-        - seperate table for access controls?
-        - server enforces per password access rules for client host and client user
-        - server always returns something, but it may be "access denied".
+        - introduce access controls
+	    - may group credentials for access management 
+	    - seperate table for access controls?
+	    - server enforces per credential access rules for client host and client user
+	    - server always returns something, but it may be "access denied".
+	    - keep simple, 1 access administrator for now
+
 
 Version 0.3 milestones:
-        - some way to tell master to add/update/delete passwords on the fly
-        - optional double encryption flag where password must be decrypted a
-            second time by key on client.
-        - seperate table for access controls
-        - access control by time of day/week
-        - option for database to be kept in sqlite
+        - expand storage options, e.g. sqlite, Tie::Hash, etc
+	- decide on replication strategy - in app layer or offload to db
+		- decision will riple to future milestones
+		- multiple servers, one master, N replicas
+		- changes are propagated from master to replicas manually
+		- Changes must be introduced at the master
+        - the servers do not share the cipher key between them
+        - some way to tell master to add/update/delete credentials on the fly
+	- enhance access controls
+	    - access control by time of day/week
+	    - hierarchical access administration / delegation
+	    - multiple access administrators
+
 
 Version 0.4 milestones
         - automatic data replication
         - no single master, all peer servers vote/agree on replication
         - automatic key replication between servers?  Is this secure?
-        - option for database to be kept in mysql, postgres, reak, redis?
+        - expand storage options if not already done for replication - mysql, postgres, reak, redis, etc
+
+
+****
+**** Should be ready for non-critical use here. ****
+****
+
 
 Version 0.5 milestones
         - optional client agent
@@ -54,15 +71,29 @@ Version 0.5 milestones
             - handles retries
             - simplfies client certificate management
 
+
 Version 0.6 milestones:
-        - auto-change passwords
-        - timeout passwords
+        - auto-change credentials
+        - timeout credentials
+
 
 Version 0.7 milestones:
-        - rewrite server in C, so we can control key memory paging, and obfuscate key memory
+        - optional double encryption flag where credential must be decrypted a second time by key on client
+        - review design decisions and decide if rewites are necessary, e.g.
+	    - rewrite server in C, so we can control key memory paging, and obfuscate key memory
+	    - rewrite client in C, so we can control memory paging, and obfuscate memory
+	    - rewrite agent in C, so we can control memory paging, and obfuscate memory
+	- add milestones as appropriate
+	- consensus on Version 1.0 goals
+
 
 Version 0.8 milestones:
-        - rewrite client in C, so we can control memory paging, and obfuscate memory
+	- To Be Determined
 
-Version 0.9 milestones:
-        - rewrite agent in C, so we can control memory paging, and obfuscate memory
+
+
+****
+**** Should be ready for robust use here. ****
+****
+
+
