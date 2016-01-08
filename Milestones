@@ -3,22 +3,38 @@ Version 0.1 milestones:
         - server has two database tables
             - encrypted credentials and metadata
             - client certificates
-        - database is kept extra simple, e.g. ndbm
-        - database changes handled outside the server, it detects the file changed by timestamp
+        - database in mariadb galera cluster
+	    - start with one node
+	    - replication easy but future work
+	    - allows multiple fields and strong types
+	    - allows multi-key indexes
+	    - well understood
         - credentials are encrypted in the database using a symetric cipher
         - the cipher key is held in server's memory
             - in test, the cipher key comes from a config file
             - in production, the cipher key comes from a human.
-        - initial server implementation in perl, so we can have taint
-        - cli client
+        - initial server implementation in perl
+	    - familiarity 
+	    - taint
+        - client agent
             - initially in perl
             - config file, global with cmd line flag
             - client certificate from config file or cmd line flag
+	    - only needs to support retrieve
+	    - runs as root
+	    - communication is via TLS and REST https-like protocol
+	    - authenticates to server using per-client-host x509 client certificates
+        - cli client
+	    - talks to agent
+            - initially in perl
+            - config file, global with cmd line flag
             - returns credential on stdout
-	    - only needs to support store and retreive
-	    - runs in userspace, as user
-	    - communication is via TLS and https-like protocol
-        - clients authenticate using per-user, possibly per-app x509 client certificates
+	    - only needs to support retrieve
+	    - runs as user
+	- management tool cli
+	    - only runs on server, as root 
+	    - can add, delete, retrieve credentials
+	    - keep simple, 1 access administrator for now
         - certificate management is manual
         - clients request a credential by unique identifier
         - names are arbitrary strings, but recommend a tuple naming scheme
@@ -31,15 +47,15 @@ Version 0.1 milestones:
 
 Version 0.2 milestones:
         - introduce access controls
-	    - may group credentials for access management 
-	    - seperate table for access controls?
+	    - may group credentials for access management?
+	    - add seperate table for access controls
 	    - server enforces per credential access rules for client host and client user
 	    - server always returns something, but it may be "access denied".
 	    - keep simple, 1 access administrator for now
 
 
 Version 0.3 milestones:
-        - expand storage options, e.g. sqlite, Tie::Hash, etc
+        - expand storage options?
 	- decide on replication strategy - in app layer or offload to db
 		- decision will riple to future milestones
 		- multiple servers, one master, N replicas
