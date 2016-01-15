@@ -1,0 +1,64 @@
+The password currator securely stores credentials, ie passwords, encryption
+keys, community strings.  It reveals them under various access controls.   
+It is intended to be used both by users and unattended batch scripts.
+
+Goals: 
+
+
+- Security of credentials at rest on filesystem  
+    - against a complete backup
+    - against the hard drive being stolen
+    - against the entire machine being stolen.
+    - against unprivledged users on the machine
+    - against root on the machine
+
+- Delivery of credentials only to allowed users on correct hosts at correct times.
+
+- Security of credentials in transit over the network. 
+    - from sniffing on 3rd machine
+    - from man-in-the-middle attack 
+    - from sniffing on server
+    - from sniffing on client
+    - from sniffing of database replication traffic
+
+- Security of credentials in server memory space, swap, etc
+    - against user level attack
+    - against root level memory scanning attack, debugger, etc
+
+- Security of credentials in client agent memory space, swap, etc
+    - against unauthorized user level attack
+    - There is little point in securing this against root memory scanning, 
+	since the credential will be delivered to a local process that is 
+	unlikely to be hardened.  
+
+- Security of credentials in client memory space, swap, etc
+    - against other unauthorized users
+    - There is little point in securing this against root memory scanning, 
+	since the credential will be delivered to a local process that is 
+	unlikely to be hardened.  
+
+- Reliability
+    - multiple replicas to protect against outages and network partitioning
+    - ability to update even when a master is down or unreachable. 
+
+- End to end authentication of the clients to the servers 
+    - x509 client certs
+
+- End to end authentication of the servers to the clients 
+    - x509 server certs
+
+- Protection against attacks on the database.
+    - encrypted credentials will be digitally signed
+
+    Strong security requires two factors, what you have and what you know. 
+The server daemon will "have" a database full of encrypted credentials.  It
+will "know" a decryption key entered by a human at start time.  That
+decryption key will be obfuscated in memory that is protected from being
+swapped out.  Temporary memory used for credential decryption will also
+need to be protected from swapping, and shredded after use.  That kind of
+memory control is only possible in relatively low level languages, ie C. 
+So the server will probably need to be in C.
+
+    However, we can start with a perl server, for protocol testing, with
+the understanding it will not be able to protect against root attacks.
+
